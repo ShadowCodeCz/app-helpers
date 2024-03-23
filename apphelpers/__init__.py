@@ -13,7 +13,6 @@ class AppDescription:
 
 
 # TODO: SUB APPLICATION
-# TODO: help vs helps, resource vs resources
 
 class LoggerHelper:
     def __init__(self, app_description, locale_path_helper):
@@ -93,6 +92,9 @@ class LocalePaths:
     def configuration_directory(self):
         return os.path.join(self.app_directory(), "configuration")
 
+    def configuration_file(self, key):
+        return os.path.join(self.configuration_directory(), f"{key}.json")
+
     def plugin_directory(self):
         return os.path.join(self.app_directory(), "plugin")
 
@@ -131,7 +133,6 @@ class PackagePaths:
 
 
 class Help:
-    # TODO: logger
     def __init__(self, locale_path_helper, logger):
         self.locale_path_helper = locale_path_helper
         self.helps = {}
@@ -142,7 +143,6 @@ class Help:
             self.helps[self.help_key(help_file)] = self.read_file(help_file)
 
     def read_file(self, path):
-        # TODO: Try except log
         try:
             with open(path, "r") as f:
                 return f.read()
@@ -164,7 +164,6 @@ class Help:
 
     def create_empty_help(self, key):
         try:
-            # TODO: Try except log
             os.makedirs(self.locale_path_helper.help_directory(), exist_ok=True)
 
             path = os.path.join(self.locale_path_helper.help_directory(), f"{key}.txt")
@@ -210,7 +209,7 @@ class Configuration:
         try:
             os.makedirs(self.path_helper.configuration_directory(), exist_ok=True)
 
-            path = os.path.join(self.path_helper.configuration_directory(), f"{key}.json")
+            path = self.path_helper.configuration_file(key)
             if not os.path.exists(path):
                 with open(path, "w+") as f:
                     json.dump(data, f, indent=4)
@@ -228,3 +227,7 @@ def cli_arguments_to_dict(arguments, key_mapping=None):
         return arguments_dict
     else:
         return {key_mapping[old_key]: value for old_key, value in arguments_dict.items()}
+
+
+def save_help(text):
+    return text.replace("%", "%%")
